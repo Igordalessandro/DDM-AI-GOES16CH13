@@ -12,7 +12,7 @@ DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image re
 5 - DDM Compares all available elements looking for patters and repetitions of elements.
 6 - Results containing the maped similar objects get stored in a json file.
 
-# **Download here**
+# **Download**
 
 download
 
