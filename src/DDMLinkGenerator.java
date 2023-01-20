@@ -1,14 +1,26 @@
 import java.util.Iterator;
 
 
-public class DDMLinkGenerator{
+public class DDMLinkGenerator {
 
     static DDMInternalConfigFile DDMInternalConfigFile;
 
     public DDMLinkGenerator(DDMInternalConfigFile loadedConfig) {
         DDMInternalConfigFile = loadedConfig;
     }
-    public DDMInternalConfigFile GenerateLinks(){
+
+    public static void SendRequest(String finalURL, String ano, String mes, String dia, String hora) {
+        DDMLinkImageDataFile newDDMLinkImageDataFile = new DDMLinkImageDataFile();
+        newDDMLinkImageDataFile.urlInput = finalURL;
+        newDDMLinkImageDataFile.ano = ano;
+        newDDMLinkImageDataFile.mes = mes;
+        newDDMLinkImageDataFile.dia = dia;
+        newDDMLinkImageDataFile.horario = hora;
+        newDDMLinkImageDataFile.diretorio = DDMInternalConfigFile.diretorio;
+        DDMInternalConfigFile.CoreRequests.add(newDDMLinkImageDataFile);
+    }
+
+    public DDMInternalConfigFile GenerateLinks() {
         boolean first = true;
 
         String mes;
@@ -102,18 +114,5 @@ public class DDMLinkGenerator{
         DDMInternalConfigFile.dmmgui.ToggleButtons(true);
         DDMInternalConfigFile.dmmgui.ConsoleText("Listando entradas processadas: " + DDMInternalConfigFile.CoreRequests.size());
         return DDMInternalConfigFile;
-    }
-
-
-
-    public static void SendRequest(String finalURL, String ano, String mes, String dia, String hora){
-        DDMLinkImageDataFile newDDMLinkImageDataFile = new DDMLinkImageDataFile();
-        newDDMLinkImageDataFile.urlInput = finalURL;
-        newDDMLinkImageDataFile.ano = ano;
-        newDDMLinkImageDataFile.mes = mes;
-        newDDMLinkImageDataFile.dia = dia;
-        newDDMLinkImageDataFile.horario = hora;
-        newDDMLinkImageDataFile.diretorio = DDMInternalConfigFile.diretorio;
-        DDMInternalConfigFile.CoreRequests.add(newDDMLinkImageDataFile);
     }
 }

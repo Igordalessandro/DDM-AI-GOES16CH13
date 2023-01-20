@@ -1,6 +1,9 @@
 import com.google.gson.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class DDMSaveLoad {
 
@@ -11,24 +14,23 @@ public class DDMSaveLoad {
         programPath = inputProgramPath;
     }
 
-
     public static DDMInternalConfigFile loadConfigs(DDMInternalConfigFile inputLoadedConfig, boolean consoleNoControl) throws IOException {
         loadedConfig = inputLoadedConfig;
         boolean ignoreMe = false;
-        try{
+        try {
             DDMInternalConfigFile.dmmgui.ToggleButtons(false);
-            File jsonInput = new File(programPath,"config.json");
+            File jsonInput = new File(programPath, "config.json");
             FileReader reader = new FileReader(jsonInput);
             JsonObject configFile = (JsonObject) JsonParser.parseReader(reader);
             reader.close();
-            if(configFile.get("diretorio").getAsString().chars().count() == 0 || configFile.get("diretorio").getAsString() == null){
+            if (configFile.get("diretorio").getAsString().chars().count() == 0 || configFile.get("diretorio").getAsString() == null) {
                 DDMInternalConfigFile.diretorio = programPath;
             }
             JsonArray anosArray = new JsonArray();
             anosArray = configFile.get("anosList").getAsJsonArray();
             if (anosArray != null && anosArray.size() > 0) {
                 DDMInternalConfigFile.anosList.clear();
-                for(int i=0; i< anosArray.size(); i++){
+                for (int i = 0; i < anosArray.size(); i++) {
                     DDMInternalConfigFile.anosList.add(anosArray.get(i).getAsString());
                 }
             } else {
@@ -44,7 +46,7 @@ public class DDMSaveLoad {
             anosBissextoArray = configFile.get("anosbissextos").getAsJsonArray();
             if (anosBissextoArray != null || anosBissextoArray.size() > 0) {
                 DDMInternalConfigFile.anosBissextos.clear();
-                for(int i=0; i< anosBissextoArray.size(); i++){
+                for (int i = 0; i < anosBissextoArray.size(); i++) {
                     DDMInternalConfigFile.anosBissextos.add(anosBissextoArray.get(i).getAsString());
                 }
             }
@@ -73,13 +75,13 @@ public class DDMSaveLoad {
             DDMInternalConfigFile.porcentagemDasComparacoesDIferencaDeTamanhoAceitavel = configFile.get("porcentagemDasComparacoesDIferencaDeTamanhoAceitavel").getAsInt();
             DDMInternalConfigFile.porcentagemDasComparacoesMinimaDeSimilaridade = configFile.get("porcentagemDasComparacoesMinimaDeSimilaridade").getAsInt();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             JsonArray anosArray2 = new JsonArray();
-            for (String s: DDMInternalConfigFile.anosList) {
+            for (String s : DDMInternalConfigFile.anosList) {
                 anosArray2.add(s);
             }
             JsonArray anosBissextoArray2 = new JsonArray();
-            for (String s: DDMInternalConfigFile.anosBissextos) {
+            for (String s : DDMInternalConfigFile.anosBissextos) {
                 anosBissextoArray2.add(s);
             }
             DDMConfig newDDMConfigFile = new DDMConfig();
@@ -89,16 +91,16 @@ public class DDMSaveLoad {
             newDDMConfigFile.demoModoRapido = true;
             newDDMConfigFile.demoModoApresentacao = true;
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            FileWriter writer = new FileWriter((programPath+"/config.json"));
-            gson.toJson(newDDMConfigFile,writer);
+            FileWriter writer = new FileWriter((programPath + "/config.json"));
+            gson.toJson(newDDMConfigFile, writer);
             writer.close();
-            if(consoleNoControl == false){
+            if (consoleNoControl == false) {
                 DDMInternalConfigFile.dmmgui.ConsoleText("Criando novo config.json");
             }
-            loadedConfig = loadConfigs(loadedConfig,true);
+            loadedConfig = loadConfigs(loadedConfig, true);
             ignoreMe = true;
         }
-        if(!ignoreMe){
+        if (!ignoreMe) {
             DDMInternalConfigFile.dmmgui.ConsoleText("config.json carregado!");
             DDMInternalConfigFile.dmmgui.ToggleButtons(true);
             return loadedConfig;

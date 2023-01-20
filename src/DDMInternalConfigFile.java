@@ -25,7 +25,7 @@ public class DDMInternalConfigFile {
     public static int areaMinimaEmPixels = 0;
     public static int demoBarSize = 0;
     public static boolean demoModoApresentacao = true;
-    public static boolean demoModoRapido  = true;
+    public static boolean demoModoRapido = true;
     public static int demoModoRapidoReScaleX = 300;
     public static int demoModoRapidoReScaleY = 300;
     public static boolean DividirModoRapido = false;
@@ -39,8 +39,8 @@ public class DDMInternalConfigFile {
     public static int porcentagemDasComparacoesMinimaDeSimilaridade = 90;
 
     public static volatile ArrayList<DDMLinkImageDataFile> CoreRequests = new ArrayList<>();
-    public static HashMap<String,HashMap<String,HashMap<String, HashMap<String,String>>>> FolderMap = new HashMap<String,HashMap<String,HashMap<String,HashMap<String,String>>>>();
-    public static HashMap<String,HashMap<String,HashMap<String, HashMap<String, HashMap<String,String>>>>> FolderMapSubs = new HashMap<String,HashMap<String,HashMap<String, HashMap<String, HashMap<String,String>>>>>();
+    public static HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>> FolderMap = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>>();
+    public static HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>>> FolderMapSubs = new HashMap<String, HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>>>();
 
     public DDMInternalConfigFile(DDMGUI DMMGUIInput, DDMLib DMMLibInput) {
         dmmgui = DMMGUIInput;

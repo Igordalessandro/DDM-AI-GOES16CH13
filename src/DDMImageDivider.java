@@ -55,7 +55,7 @@ public class DDMImageDivider {
         count = 0;
         demoModoRapido = false;
         calibration = false;
-        FolderMapClone = config.FolderMap;
+        FolderMapClone = DDMInternalConfigFile.FolderMap;
         FolderMapClone.forEach((ano, mesHashmap) -> {
             mesHashmap.forEach((mes, diaHashmap) -> {
                 diaHashmap.forEach((dia, arquivoHashmap) -> {
@@ -65,7 +65,7 @@ public class DDMImageDivider {
                         nomeDivideDataFolder = nomeDoArquivo;
                         pathDivideDataFolder = pathDoArquivo;
                         try {
-                            imageDivideDataFolder = ImageIO.read(new File(pathDoArquivo+nomeDoArquivo));
+                            imageDivideDataFolder = ImageIO.read(new File(pathDoArquivo + nomeDoArquivo));
                             try {
                                 starter(false);
                             } catch (IOException | InterruptedException e) {
@@ -97,8 +97,8 @@ public class DDMImageDivider {
     }
 
     public DDMInternalConfigFile LinkDataFolder() {
-        config.dmmgui.ConsoleText("Mapeando fotos nas pastas (..)data/anos/mes/dias.");
-        config.FolderMap.clear();
+        DDMInternalConfigFile.dmmgui.ConsoleText("Mapeando fotos nas pastas (..)data/anos/mes/dias.");
+        DDMInternalConfigFile.FolderMap.clear();
         size = 0;
         File dataFolder = new File(diretorio + "/data");
         String[] directoriesDATA = dataFolder.list(new FilenameFilter() {
@@ -132,7 +132,6 @@ public class DDMImageDivider {
                         }
                     });
                     for (String arquivo : directoriesDia) {
-
                         if (!DDMInternalConfigFile.FolderMap.containsKey(ano)) {
                             HashMap<String, String> namePath = new HashMap<>();
                             namePath.put(arquivo, diretorio + "/data/" + ano + "/" + mes + "/" + dia + "/");
@@ -235,24 +234,43 @@ public class DDMImageDivider {
             ddmgui.ConsoleText("Resolução da imagem sendo processada: (Width)X:" + Width + " (Height)Y: " + Height);
             ddmgui.ConsoleText("Dividindo " + nomeDivideDataFolder + " (trabalhando fora de ordem no modo_rapido!)");
         }
-        while (true) {
-            for (int y = 0; y < Height; y++) {
-                for (int x = 0; x < Width; x++) {
-                    while (listOfAvailableThreads.size() >= threads) {
-                        listOfAvailableThreads.removeIf(candidate -> !candidate.isAlive());
-                    }
-                    if (listOfAvailableThreads.size() < threads) {
-                        DDMImageDividerMultiThreaded threadCode = new DDMImageDividerMultiThreaded(imageMap, x, y, DIF, testImg, threads);
-                        Thread newThread = new Thread(threadCode);
-                        listOfAvailableThreads.add(newThread);
-                        newThread.start();
-                    }
-                    ddmgui.setDisplay1text("processando imagem: X: " + x + " Y: " + y + " CPU Threads: " + listOfAvailableThreads.size());
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                while (listOfAvailableThreads.size() >= threads) {
+                    listOfAvailableThreads.removeIf(candidate -> !candidate.isAlive());
                 }
+                if (listOfAvailableThreads.size() < threads) {
+                    DDMImageDividerMultiThreaded threadCode = new DDMImageDividerMultiThreaded(imageMap, x, y, DIF, testImg, threads);
+                    Thread newThread = new Thread(threadCode);
+                    listOfAvailableThreads.add(newThread);
+                    newThread.start();
+                }
+                ddmgui.setDisplay1text("processando imagem: X: " + x + " Y: " + y + " CPU Threads: " + listOfAvailableThreads.size());
             }
-            for (int y = 0; y < Height; y++) {
-                for (int x = 0; x < Width; x++) {
-                    ddmgui.setDisplay1text("pintando: X: " + x + " Y: " + y + "");
+        }
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                ddmgui.setDisplay1text("pintando: X: " + x + " Y: " + y + "");
+                try {
+                    if (imageMap.get(y).get(x) == true) {
+                        testImg.setRGB(x, y, 0x000000ff);
+                        try {
+                            filteredImageMap.get(y).put(x, false);
+                        } catch (NullPointerException z) {
+                            filteredImageMap.put(y, new HashMap<Integer, Boolean>());
+                            filteredImageMap.get(y).put(x, false);
+                        }
+                    } else {
+
+                    }
+                } catch (NullPointerException e) {
+                    int clr = testImg.getRGB(x, y);
+                    int red = (clr & 0x00ff0000) >> 16;
+                    int green = (clr & 0x0000ff00) >> 8;
+                    int blue = clr & 0x000000ff;
+                    boolean acceptable;
+                    acceptable = (Math.abs(red - green) > DIF) || (Math.abs(red - blue) > DIF) || (Math.abs(green - blue) > DIF);
+                    imageMap.get(y).put(x, acceptable);
                     try {
                         if (imageMap.get(y).get(x) == true) {
                             testImg.setRGB(x, y, 0x000000ff);
@@ -265,149 +283,128 @@ public class DDMImageDivider {
                         } else {
 
                         }
-                    } catch (NullPointerException e) {
-                        int clr = testImg.getRGB(x, y);
-                        int red = (clr & 0x00ff0000) >> 16;
-                        int green = (clr & 0x0000ff00) >> 8;
-                        int blue = clr & 0x000000ff;
-                        boolean acceptable;
-                        acceptable = (Math.abs(red - green) > DIF) || (Math.abs(red - blue) > DIF) || (Math.abs(green - blue) > DIF);
-                        imageMap.get(y).put(x, acceptable);
-                        try {
-                            if (imageMap.get(y).get(x) == true) {
-                                testImg.setRGB(x, y, 0x000000ff);
-                                try {
-                                    filteredImageMap.get(y).put(x, false);
-                                } catch (NullPointerException z) {
-                                    filteredImageMap.put(y, new HashMap<Integer, Boolean>());
-                                    filteredImageMap.get(y).put(x, false);
-                                }
-                            } else {
+                    } catch (NullPointerException f) {
 
+                    }
+                }
+            }
+        }
+        ColorModel cm = testImg.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = testImg.copyData(null);
+        backup = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+        ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
+        ddmgui.setDisplay1text("done heatmap");
+        boolean squares = false;
+        while (!squares) {
+            regionsCounter = 0;
+            for (int y = 0; y < Height; y++) {
+                for (int x = 0; x < Width; x++) {
+                    if (filteredImageMap.containsKey(y)) {
+                        if (filteredImageMap.get(y).containsKey(x)) {
+                            if (filteredImageMap.get(y).get(x) == false) {
+                                ddmgui.setDisplay1text("Marcando Região Local: X: " + x + " Y: " + y + "");
+                                //unclaimed territory start!
+                                //color
+                                Random rand = new Random();
+                                float r = (float) (rand.nextFloat() * (0.8));
+                                float g = (float) (rand.nextFloat() * (0.8));
+                                float b = (float) (rand.nextFloat() * (0.8));
+                                Color newTerritoryColor = new Color(r, g, b);
+                                //setting up new region
+                                // true = occupied
+                                filteredImageMap.get(y).put(x, true);
+                                HashMap<Integer, Boolean> xInput = new HashMap<Integer, Boolean>();
+                                xInput.put(x, true);
+                                HashMap<Integer, HashMap<Integer, Boolean>> yInput = new HashMap<Integer, HashMap<Integer, Boolean>>();
+                                yInput.put(y, xInput);
+                                regionMap.put(regionsCounter, yInput);
+                                //region done
+                                //Map neighborhood
+                                //x-y+||x y+||x+y+
+                                //x-y ||x y ||x+y
+                                //x-y-||x y-||x+y-
+                                findNeighborhood(y, x, newTerritoryColor);
+                                ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
+                                //up region
+                                regionsCounter++;
                             }
-                        } catch (NullPointerException f) {
-
                         }
                     }
                 }
             }
-            ColorModel cm = testImg.getColorModel();
-            boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-            WritableRaster raster = testImg.copyData(null);
-            backup = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+            ColorModel model = testImg.getColorModel();
+            boolean alphaMulti = model.isAlphaPremultiplied();
+            WritableRaster wRaster = testImg.copyData(null);
+            testResult = new BufferedImage(model, wRaster, alphaMulti, null);
             ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
-            ddmgui.setDisplay1text("done heatmap");
-            boolean squares = false;
-            while (!squares) {
-                regionsCounter = 0;
-                for (int y = 0; y < Height; y++) {
-                    for (int x = 0; x < Width; x++) {
-                        if (filteredImageMap.containsKey(y)) {
-                            if (filteredImageMap.get(y).containsKey(x)) {
-                                if (filteredImageMap.get(y).get(x) == false) {
-                                    ddmgui.setDisplay1text("Marcando Região Local: X: " + x + " Y: " + y + "");
-                                    //unclaimed territory start!
-                                    //color
-                                    Random rand = new Random();
-                                    float r = (float) (rand.nextFloat() * (0.8));
-                                    float g = (float) (rand.nextFloat() * (0.8));
-                                    float b = (float) (rand.nextFloat() * (0.8));
-                                    Color newTerritoryColor = new Color(r, g, b);
-                                    //setting up new region
-                                    // true = occupied
-                                    filteredImageMap.get(y).put(x, true);
-                                    HashMap<Integer, Boolean> xInput = new HashMap<Integer, Boolean>();
-                                    xInput.put(x, true);
-                                    HashMap<Integer, HashMap<Integer, Boolean>> yInput = new HashMap<Integer, HashMap<Integer, Boolean>>();
-                                    yInput.put(y, xInput);
-                                    regionMap.put(regionsCounter, yInput);
-                                    //region done
-                                    //Map neighborhood
-                                    //x-y+||x y+||x+y+
-                                    //x-y ||x y ||x+y
-                                    //x-y-||x y-||x+y-
-                                    findNeighborhood(y, x, newTerritoryColor);
-                                    ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
-                                    //up region
-                                    regionsCounter++;
-                                }
-                            }
-                        }
+            dealWithSubSectors();
+            squares = true;
+        }
+        if (calibration) {
+            ddmgui.addButton0();
+            ddmgui.addButton99();
+            while (demo) {
+                ddmgui.updateUIButton99();
+                ddmgui.updateUIButton0();
+                if (DDMGUI.butZero == 1) {
+                    return;
+                }
+                while (DDMGUI.but99 == 1) {
+                    sleep(1000);
+                    if (DDMGUI.butZero == 1) {
+                        return;
                     }
                 }
-                ColorModel model = testImg.getColorModel();
-                boolean alphaMulti = model.isAlphaPremultiplied();
-                WritableRaster wRaster = testImg.copyData(null);
-                testResult = new BufferedImage(model, wRaster, alphaMulti, null);
+                ddmgui.updateUIButton99();
+                ddmgui.updateUIButton0();
+                ddmgui.setDisplay1ImageTypeOfBufferedImage(testImgPure);
+                ddmgui.setDisplay1text("COMPARE MODE 0");
+                sleep(1000);
+                if (DDMGUI.butZero == 1) {
+                    return;
+                }
+                while (DDMGUI.but99 == 1) {
+                    sleep(1000);
+                    if (DDMGUI.butZero == 1) {
+                        return;
+                    }
+                }
+                ddmgui.updateUIButton99();
+                ddmgui.updateUIButton0();
+                ddmgui.setDisplay1ImageTypeOfBufferedImage(backup);
+                ddmgui.setDisplay1text("COMPARE MODE 1");
+                sleep(1000);
+                if (DDMGUI.butZero == 1) {
+                    return;
+                }
+                while (DDMGUI.but99 == 1) {
+                    sleep(1000);
+                    if (DDMGUI.butZero == 1) {
+                        return;
+                    }
+                }
+                ddmgui.updateUIButton99();
+                ddmgui.updateUIButton0();
                 ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
-                dealWithSubSectors();
-                squares = true;
-            }
-            if (calibration) {
-                ddmgui.addButton0();
-                ddmgui.addButton99();
-                while (demo) {
-                    ddmgui.updateUIButton99();
-                    ddmgui.updateUIButton0();
-                    if (DDMGUI.butZero == 1) {
-                        return;
-                    }
-                    while (DDMGUI.but99 == 1) {
-                        sleep(1000);
-                        if (DDMGUI.butZero == 1) {
-                            return;
-                        }
-                    }
-                    ddmgui.updateUIButton99();
-                    ddmgui.updateUIButton0();
-                    ddmgui.setDisplay1ImageTypeOfBufferedImage(testImgPure);
-                    ddmgui.setDisplay1text("COMPARE MODE 0");
-                    sleep(1000);
-                    if (DDMGUI.butZero == 1) {
-                        return;
-                    }
-                    while (DDMGUI.but99 == 1) {
-                        sleep(1000);
-                        if (DDMGUI.butZero == 1) {
-                            return;
-                        }
-                    }
-                    ddmgui.updateUIButton99();
-                    ddmgui.updateUIButton0();
-                    ddmgui.setDisplay1ImageTypeOfBufferedImage(backup);
-                    ddmgui.setDisplay1text("COMPARE MODE 1");
-                    sleep(1000);
-                    if (DDMGUI.butZero == 1) {
-                        return;
-                    }
-                    while (DDMGUI.but99 == 1) {
-                        sleep(1000);
-                        if (DDMGUI.butZero == 1) {
-                            return;
-                        }
-                    }
-                    ddmgui.updateUIButton99();
-                    ddmgui.updateUIButton0();
-                    ddmgui.setDisplay1ImageTypeOfBufferedImage(testImg);
-                    ddmgui.setDisplay1text("COMPARE MODE 2");
-                    sleep(1000);
-                    if (DDMGUI.butZero == 1) {
-                        return;
-                    }
-                    while (DDMGUI.but99 == 1) {
-                        sleep(1000);
-                        if (DDMGUI.butZero == 1) {
-                            return;
-                        }
-                    }
-                    ddmgui.updateUIButton99();
-                    ddmgui.updateUIButton0();
-                    ddmgui.setDisplay1ImageTypeOfBufferedImage(testResult);
-                    ddmgui.setDisplay1text("COMPARE MODE 3 (Border PX Size: " + demoBarSize + " )");
-                    sleep(1000);
+                ddmgui.setDisplay1text("COMPARE MODE 2");
+                sleep(1000);
+                if (DDMGUI.butZero == 1) {
+                    return;
                 }
+                while (DDMGUI.but99 == 1) {
+                    sleep(1000);
+                    if (DDMGUI.butZero == 1) {
+                        return;
+                    }
+                }
+                ddmgui.updateUIButton99();
+                ddmgui.updateUIButton0();
+                ddmgui.setDisplay1ImageTypeOfBufferedImage(testResult);
+                ddmgui.setDisplay1text("COMPARE MODE 3 (Border PX Size: " + demoBarSize + " )");
+                sleep(1000);
             }
-            break;
+
         }
     }
 
@@ -445,7 +442,7 @@ public class DDMImageDivider {
                     ImageIO.write(imagemComCrop, "jpg", outputFile);
                 }
                 if (!calibration) {
-                    File outputFile = new File(pathDivideDataFolder + "sub/" + nomeDivideDataFolder.substring(0,nomeDivideDataFolder.length()-4) + "_SubSector_" + i + ".jpg");
+                    File outputFile = new File(pathDivideDataFolder + "sub/" + nomeDivideDataFolder.substring(0, nomeDivideDataFolder.length() - 4) + "_SubSector_" + i + ".jpg");
                     ImageIO.write(imagemComCrop, "jpg", outputFile);
                 }
                 if (calibration) {

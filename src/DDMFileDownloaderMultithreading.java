@@ -12,36 +12,26 @@ import java.util.concurrent.TimeUnit;
 
 public class DDMFileDownloaderMultithreading implements Runnable {
 
-    private final DDMLinkImageDataFile ProcessData = new DDMLinkImageDataFile();
     private static int tamanhoDaImagemEsperadaWidth;
     private static int tamanhoDaImagemEsperadaHeight;
+    private static boolean recortarImagem;
 
     //Recorte
-
-    private  static boolean recortarImagem;
+    private static int xInicialDaNovaImagem;
 
     //Recorte parametros
-
-    private  static int xInicialDaNovaImagem;
-    private  static int yInicialDaNovaImagem;
-    private  static int xPlusWidth;
-    private  static int yPlusHeight;
+    private static int yInicialDaNovaImagem;
+    private static int xPlusWidth;
+    private static int yPlusHeight;
     private static DDMFileDownloader parentManager;
     private static volatile HashMap<Integer, DDMLinkImageDataFile> entryList;
+    private final DDMLinkImageDataFile ProcessData = new DDMLinkImageDataFile();
 
 
-    @Override
-    public void run(){
-        try {
-            imageManager(ProcessData);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public DDMFileDownloaderMultithreading(int realTimeId, DDMLinkImageDataFile newFile, boolean inputrecortarImagem, int inputtamanhoDaImagemEsperadaWidth, int inputtamanhoDaImagemEsperadaHeight, int inputxInicialDaNovaImagem, int inputyInicialDaNovaImagem, int inputxPlusWidth, int inputyPlusHeight, HashMap<Integer, DDMLinkImageDataFile> inputEntryList){
+    public DDMFileDownloaderMultithreading(int realTimeId, DDMLinkImageDataFile newFile, boolean inputrecortarImagem, int inputtamanhoDaImagemEsperadaWidth, int inputtamanhoDaImagemEsperadaHeight, int inputxInicialDaNovaImagem, int inputyInicialDaNovaImagem, int inputxPlusWidth, int inputyPlusHeight, HashMap<Integer, DDMLinkImageDataFile> inputEntryList) {
         ProcessData.Copy(newFile);
         recortarImagem = inputrecortarImagem;
-        ProcessData.fileInternalId = 0+realTimeId;
+        ProcessData.fileInternalId = 0 + realTimeId;
         tamanhoDaImagemEsperadaWidth = inputtamanhoDaImagemEsperadaWidth;
         tamanhoDaImagemEsperadaHeight = inputtamanhoDaImagemEsperadaHeight;
         xInicialDaNovaImagem = inputxInicialDaNovaImagem;
@@ -52,7 +42,7 @@ public class DDMFileDownloaderMultithreading implements Runnable {
     }
 
     public static void imageManager(DDMLinkImageDataFile ProcessData) throws IOException {
-        if(ProcessData.dia == "9"){
+        if (ProcessData.dia == "9") {
             ProcessData.errorCode = 9;
             return;
         }
@@ -63,14 +53,14 @@ public class DDMFileDownloaderMultithreading implements Runnable {
             TimeUnit.SECONDS.sleep(1);
         } catch (IIOException e) {
             ProcessData.errorCode = 1;
-            entryList.put(ProcessData.fileInternalId,ProcessData);
+            entryList.put(ProcessData.fileInternalId, ProcessData);
             return;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(download == null){
+        if (download == null) {
             ProcessData.errorCode = 2;
-            entryList.put(ProcessData.fileInternalId,ProcessData);
+            entryList.put(ProcessData.fileInternalId, ProcessData);
             return;
         }
         if (download.getHeight(null) == tamanhoDaImagemEsperadaHeight) {
@@ -84,27 +74,36 @@ public class DDMFileDownloaderMultithreading implements Runnable {
                     BufferedImage imagemComCrop = new BufferedImage(preparado.getWidth(), preparado.getHeight(), BufferedImage.TYPE_INT_RGB);
                     Graphics g = imagemComCrop.createGraphics();
                     g.drawImage(preparado, 0, 0, null);
-                    Files.createDirectories(Paths.get(ProcessData.diretorio+"/data/" + ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia));
-                    File outputfile = new File(ProcessData.diretorio +"/data/"+ ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia + "/" + ProcessData.ano + "." + ProcessData.mes + "." + ProcessData.dia + "." + ProcessData.horario + ".jpg");
+                    Files.createDirectories(Paths.get(ProcessData.diretorio + "/data/" + ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia));
+                    File outputfile = new File(ProcessData.diretorio + "/data/" + ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia + "/" + ProcessData.ano + "." + ProcessData.mes + "." + ProcessData.dia + "." + ProcessData.horario + ".jpg");
                     ImageIO.write(imagemComCrop, "jpg", outputfile);
                     ProcessData.imagemCrop = imagemComCrop;
                 } else {
-                    Files.createDirectories(Paths.get(ProcessData.diretorio +"/data/"+ ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia));
-                    File outputfile = new File(ProcessData.diretorio +"/data/"+ ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia + "/" + ProcessData.ano + "." + ProcessData.mes + "." + ProcessData.dia + "." + ProcessData.horario + ".jpg");
+                    Files.createDirectories(Paths.get(ProcessData.diretorio + "/data/" + ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia));
+                    File outputfile = new File(ProcessData.diretorio + "/data/" + ProcessData.ano + "/" + ProcessData.mes + "/" + ProcessData.dia + "/" + ProcessData.ano + "." + ProcessData.mes + "." + ProcessData.dia + "." + ProcessData.horario + ".jpg");
                     ImageIO.write(imagemCarregada, "jpg", outputfile);
                 }
-                entryList.put(ProcessData.fileInternalId,ProcessData);
+                entryList.put(ProcessData.fileInternalId, ProcessData);
                 return;
             } else {
                 ProcessData.errorCode = 4;
-                entryList.put(ProcessData.fileInternalId,ProcessData);
+                entryList.put(ProcessData.fileInternalId, ProcessData);
             }
         } else {
             ProcessData.errorCode = 3;
-            entryList.put(ProcessData.fileInternalId,ProcessData);
+            entryList.put(ProcessData.fileInternalId, ProcessData);
         }
         ProcessData.errorCode = 99;
-        entryList.put(ProcessData.fileInternalId,ProcessData);
+        entryList.put(ProcessData.fileInternalId, ProcessData);
         return;
+    }
+
+    @Override
+    public void run() {
+        try {
+            imageManager(ProcessData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

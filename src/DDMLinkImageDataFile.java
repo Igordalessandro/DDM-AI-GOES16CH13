@@ -12,7 +12,7 @@ public class DDMLinkImageDataFile {
     public BufferedImage imagemCrop;
     public int errorCode = 0;
 
-    public void Copy(DDMLinkImageDataFile newData){
+    public void Copy(DDMLinkImageDataFile newData) {
         fileInternalId = newData.fileInternalId;
         urlInput = newData.urlInput;
         ano = newData.ano;

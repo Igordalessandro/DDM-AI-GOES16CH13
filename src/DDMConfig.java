@@ -14,7 +14,7 @@ public class DDMConfig {
     //modo demo (calibração)
     public boolean demoModoApresentacao = true;
     //reduz a resolução da imagem para 150x150 para processamento rapido.
-    public boolean demoModoRapido  = true;
+    public boolean demoModoRapido = true;
     public int demoModoRapidoReScaleX = 300;
     public int demoModoRapidoReScaleY = 300;
     public boolean calibrationOutPutToSubFolder = false;
