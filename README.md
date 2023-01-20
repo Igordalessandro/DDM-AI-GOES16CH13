@@ -5,6 +5,7 @@ DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image re
 # **Download**
 
 [Click here to download.](https://github.com/Igordalessandro/DDM-AI-GOES16CH13/releases/download/Release/DDM.zip)  
+(requires JDK 19)
 
 # **Introduction**
 
