@@ -1,5 +1,6 @@
 DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image recognition and pattern detection. For scientific analysis.
 (Only avaliable for windows at this moment)
+(EN interface yet to be released)
 
 # **Introduction**
 
