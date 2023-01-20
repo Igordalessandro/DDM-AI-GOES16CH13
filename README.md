@@ -3,7 +3,7 @@ DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image re
 
 # **Introduction**
 
-[main](./imagens/main.jpg)
+![main](./imagens/main.jpg)
 
  The DDM (Dalessandro data miner) GOES 16 (Geostationary Operational Environmental Satellites number 16) is a complete tool for downloading, storing, pattern detection and IA image processing for the GOES-16 pre-processed chanel 13 (ch13) products available at INPE (INPE - Instituto Nacional de Pesquisas Espaciais || Eng: National institute of aerospace research). This program was made to meet the needs of the UFRJ (Universidade federal do Rio de Janeiro || Eng: Federal University of Rio de Janeiro) - Department of Meteorology of the Institute of Geosciences at the Center for Mathematical and Natural Sciences. The DDM features and workflow are as follow:
 
