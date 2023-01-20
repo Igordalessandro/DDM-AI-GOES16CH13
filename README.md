@@ -2,6 +2,10 @@ DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image re
 (Only avaliable for windows at this moment)
 (EN interface yet to be released)
 
+# **Download**
+
+[download](https://github.com/Igordalessandro/DDM-AI-GOES16CH13/releases/download/Release/DDM.zip)  
+
 # **Introduction**
 
 ![main](./imagens/main.jpg)  
@@ -15,11 +19,7 @@ DDM - GOES 16 CH.13 - INPE (PT/BR) - AI - Data auto-downloader/manager, image re
 5 - DDM Compares all available elements looking for patters and repetitions of elements.  
 6 - Results containing the maped similar objects get stored in a json file.  
 
-# **Download**
-
-[download](https://github.com/Igordalessandro/DDM-AI-GOES16CH13/releases/download/Release/DDM.zip)  
-
-# **Features**
+# **Tool Features**
 
 1 - All the core instructions can be modified and calibrated by a research team to find better/usefull results.(config.json file)  
 2 - All steps of this program are multithreaded. (This tool is CPU intensive.)  
